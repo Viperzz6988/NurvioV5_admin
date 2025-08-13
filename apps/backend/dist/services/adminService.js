@@ -4,6 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listUsers = listUsers;
+exports.listUsersSelect = listUsersSelect;
+exports.stats = stats;
 exports.createUser = createUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
@@ -11,6 +13,7 @@ exports.bulkDelete = bulkDelete;
 exports.bulkRoleChange = bulkRoleChange;
 exports.bulkBan = bulkBan;
 exports.toggleFeatureFlag = toggleFeatureFlag;
+exports.listFeatureFlags = listFeatureFlags;
 exports.toggleMaintenanceMode = toggleMaintenanceMode;
 exports.clearCache = clearCache;
 exports.metrics = metrics;
@@ -40,6 +43,32 @@ async function listUsers(query) {
         prisma_1.prisma.user.count({ where }),
     ]);
     return { items, total };
+}
+async function listUsersSelect(search) {
+    const where = {};
+    if (search)
+        where.OR = [
+            { username: { contains: search, mode: 'insensitive' } },
+            { email: { contains: search, mode: 'insensitive' } },
+            { id: { contains: search } },
+        ];
+    const users = await prisma_1.prisma.user.findMany({
+        where,
+        orderBy: { username: 'asc' },
+        take: 50,
+        select: { id: true, username: true, isBanned: true, roles: { select: { name: true } } },
+    });
+    return users.map((u) => ({ id: u.id, username: u.username, role: u.roles[0]?.name || 'USER', banned: u.isBanned }));
+}
+async function stats() {
+    const now = new Date();
+    const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const [totalUsers, activeUsers, bannedUsers] = await Promise.all([
+        prisma_1.prisma.user.count(),
+        prisma_1.prisma.user.count({ where: { lastLoginAt: { gte: dayAgo } } }),
+        prisma_1.prisma.user.count({ where: { isBanned: true } }),
+    ]);
+    return { totalUsers, activeUsers, bannedUsers };
 }
 async function createUser(data) {
     return prisma_1.prisma.user.create({
@@ -86,6 +115,9 @@ async function bulkBan(ids, isBanned) {
 }
 async function toggleFeatureFlag(key, enabled) {
     return prisma_1.prisma.featureFlag.upsert({ where: { key }, update: { enabled }, create: { key, enabled } });
+}
+async function listFeatureFlags() {
+    return prisma_1.prisma.featureFlag.findMany({ orderBy: { key: 'asc' } });
 }
 async function toggleMaintenanceMode(enabled) {
     return prisma_1.prisma.setting.upsert({ where: { key: 'maintenance' }, update: { value: { enabled } }, create: { key: 'maintenance', value: { enabled } } });

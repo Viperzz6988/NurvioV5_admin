@@ -15,6 +15,21 @@ export async function getUsers(req: Request, res: Response) {
   res.json(data);
 }
 
+export async function getUsersSelect(req: Request, res: Response) {
+  const list = await admin.listUsersSelect((req.query.search as string) || undefined);
+  res.json(list);
+}
+
+export async function stats(_req: Request, res: Response) {
+  const s = await admin.stats();
+  res.json(s);
+}
+
+export async function getFeatureFlags(_req: Request, res: Response) {
+  const flags = await admin.listFeatureFlags();
+  res.json(flags);
+}
+
 export async function createUser(req: AuthRequest, res: Response) {
   const { email, username, password, roles } = req.body as { email: string; username: string; password: string; roles: string[] };
   const passwordHash = await bcrypt.hash(password, 12);

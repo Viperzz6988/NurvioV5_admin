@@ -4,11 +4,12 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api',
 });
 
-let accessToken: string | null = null;
+let accessToken: string | null = localStorage.getItem('accessToken');
 let refreshTokenValue: string | null = localStorage.getItem('refreshToken');
 
 export function setTokens(at: string | null, rt?: string | null) {
   accessToken = at;
+  if (at) localStorage.setItem('accessToken', at); else localStorage.removeItem('accessToken');
   if (rt !== undefined) {
     refreshTokenValue = rt;
     if (rt) localStorage.setItem('refreshToken', rt);
@@ -27,7 +28,7 @@ let queue: Array<() => void> = [];
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
-    const original = error.config;
+    const original = error.config as any;
     if (error.response?.status === 401 && !original._retry && refreshTokenValue) {
       original._retry = true;
       if (isRefreshing) {

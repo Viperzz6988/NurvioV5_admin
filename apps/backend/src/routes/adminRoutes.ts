@@ -15,6 +15,9 @@ import {
   exportAll,
   importAll,
   leaderboard,
+  getUsersSelect,
+  stats,
+  getFeatureFlags,
 } from '../controllers/adminController';
 import { requireAuth, requireRoles } from '../middlewares/auth';
 
@@ -23,6 +26,9 @@ const router = Router();
 router.use(requireAuth, requireRoles(['ADMIN', 'SUPERADMIN']));
 
 router.get('/users', getUsers);
+router.get('/users/select-list', getUsersSelect);
+router.get('/stats', stats);
+router.get('/feature-flags', getFeatureFlags);
 router.post('/users', createUser);
 router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);

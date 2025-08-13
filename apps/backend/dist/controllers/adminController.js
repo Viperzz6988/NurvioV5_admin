@@ -37,6 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUsers = getUsers;
+exports.getUsersSelect = getUsersSelect;
+exports.stats = stats;
+exports.getFeatureFlags = getFeatureFlags;
 exports.createUser = createUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
@@ -63,6 +66,18 @@ async function getUsers(req, res) {
         take: req.query.take ? Number(req.query.take) : undefined,
     });
     res.json(data);
+}
+async function getUsersSelect(req, res) {
+    const list = await admin.listUsersSelect(req.query.search || undefined);
+    res.json(list);
+}
+async function stats(_req, res) {
+    const s = await admin.stats();
+    res.json(s);
+}
+async function getFeatureFlags(_req, res) {
+    const flags = await admin.listFeatureFlags();
+    res.json(flags);
 }
 async function createUser(req, res) {
     const { email, username, password, roles } = req.body;

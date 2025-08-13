@@ -23,6 +23,33 @@ export async function listUsers(query: { search?: string; role?: string; banned?
   return { items, total };
 }
 
+export async function listUsersSelect(search?: string) {
+  const where: any = {};
+  if (search) where.OR = [
+    { username: { contains: search, mode: 'insensitive' } },
+    { email: { contains: search, mode: 'insensitive' } },
+    { id: { contains: search } },
+  ];
+  const users = await prisma.user.findMany({
+    where,
+    orderBy: { username: 'asc' },
+    take: 50,
+    select: { id: true, username: true, isBanned: true, roles: { select: { name: true } } },
+  });
+  return users.map((u) => ({ id: u.id, username: u.username, role: u.roles[0]?.name || 'USER', banned: u.isBanned }));
+}
+
+export async function stats() {
+  const now = new Date();
+  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const [totalUsers, activeUsers, bannedUsers] = await Promise.all([
+    prisma.user.count(),
+    prisma.user.count({ where: { lastLoginAt: { gte: dayAgo } } }),
+    prisma.user.count({ where: { isBanned: true } }),
+  ]);
+  return { totalUsers, activeUsers, bannedUsers };
+}
+
 export async function createUser(data: { email: string; username: string; passwordHash: string; roles: string[] }) {
   return prisma.user.create({
     data: {
@@ -74,6 +101,10 @@ export async function bulkBan(ids: string[], isBanned: boolean) {
 
 export async function toggleFeatureFlag(key: string, enabled: boolean) {
   return prisma.featureFlag.upsert({ where: { key }, update: { enabled }, create: { key, enabled } });
+}
+
+export async function listFeatureFlags() {
+  return prisma.featureFlag.findMany({ orderBy: { key: 'asc' } });
 }
 
 export async function toggleMaintenanceMode(enabled: boolean) {
