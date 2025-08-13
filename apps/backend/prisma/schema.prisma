@@ -28,6 +28,7 @@ model User {
   refreshTokens   RefreshToken[]
   auditLogs       AuditLog[]
   leaderboardEntry LeaderboardEntry?
+  score           Int            @default(0)
 }
 
 model Role {

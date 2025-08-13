@@ -16,7 +16,6 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
-app.use('/api', apiLimiter);
 
 app.get('/health', async (_req, res) => {
   try {
@@ -49,7 +48,7 @@ app.use(async (req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/public', publicRoutes);
+app.use('/api/public', apiLimiter, publicRoutes);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
