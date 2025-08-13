@@ -1,0 +1,1 @@
+{"root":["./src/i18n.ts","./src/main.tsx","./src/vite-env.d.ts","./src/contexts/AuthContext.tsx","./src/contexts/ThemeContext.tsx","./src/pages/Admin.tsx","./src/pages/App.tsx","./src/pages/Contact.tsx","./src/pages/Leaderboard.tsx","./src/pages/Login.tsx","./src/services/api.ts"],"version":"5.8.3"}
