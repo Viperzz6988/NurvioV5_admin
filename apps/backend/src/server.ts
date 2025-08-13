@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes';
 import adminRoutes from './routes/adminRoutes';
 import publicRoutes from './routes/publicRoutes';
 import { apiLimiter } from './middlewares/rateLimit';
+import { verifyAccessToken } from './utils/jwt';
 
 const app = express();
 app.use(helmet());
@@ -42,12 +43,26 @@ async function isMaintenance(): Promise<boolean> {
 }
 
 app.use(async (req, res, next) => {
-  if (await isMaintenance()) return res.status(503).json({ message: 'Maintenance mode' });
-  next();
+  const maintenance = await isMaintenance();
+  if (!maintenance) return next();
+
+  // Allow admins during maintenance
+  try {
+    const auth = req.headers.authorization;
+    if (auth?.startsWith('Bearer ')) {
+      const token = auth.slice(7);
+      const payload = verifyAccessToken(token);
+      const roles = payload.roles || [];
+      const isAdmin = roles.includes('ADMIN') || roles.includes('SUPERADMIN');
+      if (isAdmin) return next();
+    }
+  } catch {}
+
+  return res.status(503).json({ message: 'Maintenance mode' });
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/public', apiLimiter, publicRoutes);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

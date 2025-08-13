@@ -3,12 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.audit = audit;
 exports.auditMiddleware = auditMiddleware;
 const prisma_1 = require("../db/prisma");
-async function audit(action, details) {
+async function audit(action, details, userId) {
     try {
         await prisma_1.prisma.auditLog.create({
             data: {
                 action,
                 details,
+                userId,
             },
         });
     }

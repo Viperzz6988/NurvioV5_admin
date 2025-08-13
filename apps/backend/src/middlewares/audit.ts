@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../db/prisma';
 
-export async function audit(action: string, details?: any) {
+export async function audit(action: string, details?: any, userId?: string) {
   try {
     await prisma.auditLog.create({
       data: {
         action,
         details,
+        userId,
       },
     });
   } catch (err) {

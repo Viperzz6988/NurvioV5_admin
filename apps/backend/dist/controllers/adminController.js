@@ -68,7 +68,7 @@ async function createUser(req, res) {
     const { email, username, password, roles } = req.body;
     const passwordHash = await bcryptjs_1.default.hash(password, 12);
     const user = await admin.createUser({ email, username, passwordHash, roles: roles || ['USER'] });
-    await (0, audit_1.audit)('admin.createUser', { id: user.id, email: user.email });
+    await (0, audit_1.audit)('admin.createUser', { id: user.id, email: user.email }, req.user?.userId);
     res.json(user);
 }
 async function updateUser(req, res) {
@@ -78,50 +78,51 @@ async function updateUser(req, res) {
     if (password)
         data.passwordHash = await bcryptjs_1.default.hash(password, 12);
     const user = await admin.updateUser(id, data);
+    await (0, audit_1.audit)('admin.updateUser', { id }, req.user?.userId);
     res.json(user);
 }
 async function deleteUser(req, res) {
     const id = req.params.id;
     await admin.deleteUser(id);
-    await (0, audit_1.audit)('admin.deleteUser', { id });
+    await (0, audit_1.audit)('admin.deleteUser', { id }, req.user?.userId);
     res.json({ success: true });
 }
 async function bulkDelete(req, res) {
     const { ids } = req.body;
     await admin.bulkDelete(ids);
-    await (0, audit_1.audit)('admin.bulkDelete', { ids });
+    await (0, audit_1.audit)('admin.bulkDelete', { ids }, req.user?.userId);
     res.json({ success: true });
 }
 async function bulkRoleChange(req, res) {
     const { ids, role } = req.body;
     await admin.bulkRoleChange(ids, role);
-    await (0, audit_1.audit)('admin.bulkRoleChange', { ids, role });
+    await (0, audit_1.audit)('admin.bulkRoleChange', { ids, role }, req.user?.userId);
     res.json({ success: true });
 }
 async function bulkBan(req, res) {
     const { ids, isBanned } = req.body;
     await admin.bulkBan(ids, isBanned);
-    await (0, audit_1.audit)('admin.bulkBan', { ids, isBanned });
+    await (0, audit_1.audit)('admin.bulkBan', { ids, isBanned }, req.user?.userId);
     res.json({ success: true });
 }
 async function featureFlag(req, res) {
     const { key, enabled } = req.body;
     const flag = await admin.toggleFeatureFlag(key, enabled);
-    await (0, audit_1.audit)('admin.featureFlag', { key, enabled });
+    await (0, audit_1.audit)('admin.featureFlag', { key, enabled }, req.user?.userId);
     res.json(flag);
 }
 async function maintenance(req, res) {
     const { enabled } = req.body;
     const out = await admin.toggleMaintenanceMode(enabled);
-    await (0, audit_1.audit)('admin.maintenance', { enabled });
+    await (0, audit_1.audit)('admin.maintenance', { enabled }, req.user?.userId);
     res.json(out);
 }
 async function clearServerCache(req, res) {
     const out = await admin.clearCache();
-    await (0, audit_1.audit)('admin.clearCache');
+    await (0, audit_1.audit)('admin.clearCache', undefined, req.user?.userId);
     res.json(out);
 }
-async function getMetrics(req, res) {
+async function getMetrics(_req, res) {
     const out = await admin.metrics();
     res.json(out);
 }
@@ -138,14 +139,16 @@ async function getAuditLogs(req, res) {
 }
 async function exportAll(req, res) {
     const data = await admin.exportData();
+    await (0, audit_1.audit)('admin.export', undefined, req.user?.userId);
     res.json(data);
 }
 async function importAll(req, res) {
     const payload = req.body;
     const data = await admin.importData(payload);
+    await (0, audit_1.audit)('admin.import', undefined, req.user?.userId);
     res.json(data);
 }
-async function leaderboard(req, res) {
+async function leaderboard(_req, res) {
     const data = await admin.leaderboardPublic();
     res.json(data);
 }
