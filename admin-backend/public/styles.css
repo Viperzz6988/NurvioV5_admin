@@ -1,0 +1,26 @@
+:root { color-scheme: light dark; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: #f8fafc; color: #0f172a; }
+.container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+h1 { margin-top: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.3px; }
+h2 { font-size: 20px; margin: 16px 0; }
+.card { display: grid; gap: 12px; padding: 18px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff; box-shadow: 0 8px 24px rgba(2, 6, 23, 0.04); }
+label { display: grid; gap: 6px; font-size: 14px; color: #334155; }
+input, textarea, button { font: inherit; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; }
+input:focus, textarea:focus { outline: none; border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+button { background: linear-gradient(180deg, #3b82f6, #2563eb); color: #fff; border-color: #2563eb; cursor: pointer; font-weight: 600; }
+button:hover { filter: brightness(0.97); }
+.error { color: #b91c1c; font-weight: 600; }
+.status { color: #065f46; font-weight: 600; }
+.hidden { display: none; }
+.toolbar { margin-bottom: 16px; display: flex; gap: 8px; }
+
+/* Dropdown */
+.user-dropdown { position: relative; width: 420px; }
+.user-dropdown-toggle { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; background: #fff; text-align: left; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; }
+.user-dropdown-toggle .user-dropdown-label { color: #0f172a; }
+.user-dropdown-menu { display: none; position: absolute; z-index: 20; top: 100%; left: 0; right: 0; max-height: 320px; overflow: auto; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 12px; margin-top: 6px; box-shadow: 0 12px 28px rgba(2, 6, 23, 0.12); }
+.user-dropdown.open .user-dropdown-menu { display: block; }
+.user-item { padding: 10px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.user-item[aria-selected="true"], .user-item:hover { background: #eff6ff; }
+.user-item .left { flex: 1; font-variant-numeric: tabular-nums; color: #1f2937; }
+.user-item .right { flex: 1; text-align: right; color: #475569; }

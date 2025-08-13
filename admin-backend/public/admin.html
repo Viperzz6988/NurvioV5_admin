@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Admin Dashboard</h1>
+
+    <section id="loginSection">
+      <h2>Login</h2>
+      <form id="loginForm" class="card">
+        <label>Email <input id="email" type="email" required /></label>
+        <label>Password <input id="password" type="password" required /></label>
+        <button type="submit">Login</button>
+        <div id="loginError" class="error"></div>
+      </form>
+    </section>
+
+    <section id="adminSection" class="hidden">
+      <div class="toolbar">
+        <button id="logoutBtn">Logout</button>
+      </div>
+      <h2>Target User</h2>
+      <div class="user-dropdown" id="userDropdown">
+        <button type="button" class="user-dropdown-toggle" aria-haspopup="listbox" aria-expanded="false">
+          <span class="user-dropdown-label">Select Target User</span>
+        </button>
+        <div class="user-dropdown-menu" role="listbox" tabindex="-1" aria-activedescendant=""></div>
+        <input type="hidden" name="targetUserId" id="targetUserId" />
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/admin-dropdown.js" type="module"></script>
+  <script src="/assets/admin.js" type="module"></script>
+</body>
+</html>
