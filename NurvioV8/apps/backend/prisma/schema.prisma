@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  GUEST
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  username        String         @unique
+  passwordHash    String
+  roles           Role[]
+  isBanned        Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  lastLoginAt     DateTime?
+  preferences     Json?
+  refreshTokens   RefreshToken[]
+  auditLogs       AuditLog[]
+  leaderboardEntry LeaderboardEntry?
+  score           Int            @default(0)
+}
+
+model Role {
+  id      String    @id @default(cuid())
+  name    RoleName  @unique
+  users   User[]
+}
+
+model RefreshToken {
+  id            String   @id @default(cuid())
+  tokenHash     String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime @default(now())
+  revokedAt     DateTime?
+  expiresAt     DateTime
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+  action      String
+  ip          String?
+  userAgent   String?
+  details     Json?
+  createdAt   DateTime @default(now())
+}
+
+model FeatureFlag {
+  key        String  @id
+  enabled    Boolean @default(false)
+  updatedAt  DateTime @updatedAt
+}
+
+model Setting {
+  key        String @id
+  value      Json
+  updatedAt  DateTime @updatedAt
+}
+
+model LeaderboardEntry {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  score     Int      @default(0)
+  hidden    Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
